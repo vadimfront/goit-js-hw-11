@@ -6,38 +6,52 @@ import {
   showSuccessNotification,
 } from './notifications';
 import { lightbox } from './lightbox';
+import { hideSpinner, showSpinner } from './spinner';
 
 let keyword = '';
 let currentPage = 1;
 
 const getData = async () => {
-  console.log('getData');
+  btnHide();
+  showSpinner();
   const { hits, totalHits } = await fetchImages(keyword, currentPage);
-
   if (hits.length === 0 && totalHits === 0) {
     showFailureNotification();
+    hideSpinner();
     return;
   }
   showSuccessNotification(totalHits);
 
-  if (hits.length === 40) btnLoadMore.classList.remove('hidden');
+  if (hits.length === 40) btnShow();
+  hideSpinner();
   render(hits);
 };
 
 const loadNextPage = async () => {
+  showSpinner();
   const { hits, totalHits } = await fetchImages(keyword, currentPage);
   if (hits.length === 0 && totalHits === 0) {
     showFailureNotification();
+    hideSpinner();
     return;
   }
   currentPage++;
+  hideSpinner();
   render(hits);
   if (currentPage * 40 >= totalHits) {
     showEndOfResultsNotification();
-    btnLoadMore.classList.add('hidden');
+    btnHide();
     return;
   }
 };
+
+function btnHide() {
+  btnLoadMore.classList.add('hidden');
+}
+
+function btnShow() {
+  btnLoadMore.classList.remove('hidden');
+}
 
 function handlerForm(e) {
   e.preventDefault();
